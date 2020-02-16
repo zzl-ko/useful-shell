@@ -30,7 +30,7 @@ function self_extracting_setup(){
     # Start extracting the self-extracting package to self-extracting the specified floder
     tail -c ${PACKAGE_SIZ} $0 | ${UNCOMPRESS} ${EXTRACT_DIR}
     [ $? -ne 0 ] && echo "[Err: Extracting failed!]" && rm -rf $EXTRACT_DIR && return 2
-    echo "*** The package has been unpacked successfully ***"
+    echo -e "*** The package has been unpacked successfully *** \n\n"
     # Start perform the actions practiced in the self-extracting package
     if [ -f "$EXTRACT_DIR/$EXEC_SCRIPT" ]; then
         chmod +x $EXTRACT_DIR/$EXEC_SCRIPT
@@ -42,7 +42,6 @@ function self_extracting_setup(){
     else
         echo "*** There is no other actions, so will return! ***"
     fi
-    
     return $?
 }
 
@@ -56,7 +55,7 @@ function self_extracting_make(){
             p) package="$OPTARG" ;;
             e) exefile="$OPTARG" ;;
             h|?)
-                echo "Usage: ./makeSelfExtracting.sh makeself [-s dstfile] [-p package] [-e exefile]"
+                echo "Usage: ./$EXEFILE_SEF makeself [-s dstfile] [-p package] [-e exefile]"
                 exit 1
                 ;;
         esac
@@ -79,12 +78,13 @@ function self_extracting_make(){
         # "|" is used as the delimiter here to avoid duplication with "/" in the path
         sed -i "s|^EXEC_SCRIPT=setup.sh$|EXEC_SCRIPT=${exefile}|" ."$EXEFILE_SEF"
     fi
-    [ -n "$dstfile" ] || dstfile=SelfExtractingPackage.run
+    [ -n "$dstfile" ] || dstfile=$(basename "$(realpath $package)").run
     cat ."$EXEFILE_SEF" > ${dstfile}
     cat ${TMP_PACKAGE} >> ${dstfile}
     chmod +x ${dstfile}
     rm -f "$TMP_PACKAGE" ."$EXEFILE_SEF"
     echo "*** The self-extracting package has been created successfully ***"
+    echo "The filename of the executable package is: $dstfile"
 }
 
 function main(){
