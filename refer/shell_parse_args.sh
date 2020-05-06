@@ -43,6 +43,8 @@ function use_getopts_parse_args()
 
     echo 处理完参数后的 OPTIND: $OPTIND
     echo 移除已处理参数个数: $((OPTIND-1))
+    #通过shift $(($OPTIND - 1))的处理，$*中就只保留了除去选项内容的参数，
+    #可以在后面的shell程序中进行处理
     shift $((OPTIND-1))
     echo 参数索引位置: $OPTIND
     echo 准备处理余下的参数:
