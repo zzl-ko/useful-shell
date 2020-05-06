@@ -1,6 +1,6 @@
 #!/bin/bash
 ###############################################################################
-# Author  : Kevin Zhou <zzl.ko@outlook.com>
+# Author  : Kevin Zhou<kevin.zhou@robotemi.com>
 # Date    : 2019-09-03
 # Version : v1.0
 # Abstract: make the self-extracting package
@@ -15,7 +15,7 @@ export MAKESELF_SH=${EXTRACT_DIR}/.makeSelfExtracting.sh
 EXEFILE_SEF=$(basename "$(realpath $0)")
 TMP_PACKAGE=.pack-$(date +%s)
 ENCOMPRESS='tar -jcf'
-UNCOMPRESS='tar -jxv -C'
+UNCOMPRESS='tar -jx -C'
 
 function self_extracting_setup(){
     # refer: https://blog.csdn.net/saintdsc/article/details/47340165
@@ -49,6 +49,7 @@ function self_extracting_make(){
     local dstfile
     local package
     local exefile
+    local tmpname
     while getopts ":s:p:e:" opt > /dev/null; do
         case "$opt" in
             s) dstfile="$OPTARG" ;;
@@ -65,8 +66,10 @@ function self_extracting_make(){
         echo "No such file or directory" && exit 2
     elif [ ! -f "$package" ] && [ ! -d "$package" ]; then
         unset package
+        tmpname=${exefile}
     elif [ ! -f "$exefile" ]; then
         unset exefile
+        tmpname=${package}
     fi
     ${ENCOMPRESS} ${TMP_PACKAGE} ${package} ${exefile}
     cp "$(realpath $0)" ."$EXEFILE_SEF"
@@ -78,7 +81,7 @@ function self_extracting_make(){
         # "|" is used as the delimiter here to avoid duplication with "/" in the path
         sed -i "s|^EXEC_SCRIPT=setup.sh$|EXEC_SCRIPT=${exefile}|" ."$EXEFILE_SEF"
     fi
-    [ -n "$dstfile" ] || dstfile=$(basename "$(realpath $package)").run
+    [ -n "$dstfile" ] || dstfile=$(basename "$(realpath $tmpname)").run
     cat ."$EXEFILE_SEF" > ${dstfile}
     cat ${TMP_PACKAGE} >> ${dstfile}
     chmod +x ${dstfile}
