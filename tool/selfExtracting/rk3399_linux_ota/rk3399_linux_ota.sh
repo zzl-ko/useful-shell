@@ -87,6 +87,10 @@ function ota_usages()
     echo "create a execable ota: ./ota -n -v 1.9 [-k]"
     echo "deploy a execable ota: ./ota [-d]"
     echo 
+    echo "Firmware store map:"
+    echo "('0x00002000+0x00002000+0x00002000+0x00002000+0x00008000+0x0000C000+0x00010000 - 1 ', opensource.rock-chips.com/wiki_Partitions)"
+    echo "('reserved   uboot      trust      misc       resource   kernel     boot        MBR', refer parameter.txt)"
+    echo 
     echo "TYPE_OF_IMG: $TYPE_OF_IMG"
     echo "BAK_BLK_CNT: $BAK_BLK_CNT"
     echo "BAK_BLK_SKP: $BAK_BLK_SKP"
@@ -98,9 +102,6 @@ function ota_usages()
 function ota_cmdline_parser()
 {
     local flag=0
-
-#("0x00002000+0x00002000+0x00002000+0x00002000+0x00008000+0x0000C000+0x00010000 - 1", opensource.rock-chips.com/wiki_Partitions)
-#( reserved   uboot      trust      misc       resource   kernel     boot        MBR, refer parameter.txt)
 
     while getopts ":hdnNv:lLuUtTmMrRkKB" opt > /dev/null; do
         case "$opt" in
