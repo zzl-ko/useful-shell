@@ -1,0 +1,23 @@
+[alias]
+	diffall = git-diffall
+	lsbranch = !"for k in `git branch|perl -pe s/^..//`;do echo `git show --pretty=format:\"%Cgreen%ci %Cblue%cr%Creset\" $k|head -n 1`\\\t$k;done|sort"
+
+[diff]
+	tool = meld
+[difftool]
+	prompt = false
+[difftool "meld"]
+	cmd = meld "$LOCAL" "$REMOTE"
+
+[merge]
+	tool = meld
+	conflictstyle = diff3
+[mergetool]
+	keepBackup = false
+[mergetool "meld"]
+	cmd = meld $LOCAL $BASE $REMOTE --output=$MERGED --auto-merge
+
+[show]
+	tool = meld
+[color]
+	ui = auto
