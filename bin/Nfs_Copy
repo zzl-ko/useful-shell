@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+###############################################################################
+# Author  : Kevin Oscar<zrzxlfe@sina.com>
+# Date    : 2020-06-30
+# Version : v0.1
+# Abstract: 对于NFS共享目录，为防止文件误删，故将某一些目录设置特别权限
+#           该脚本即用于将文件放置到已设置特别权限的目录下，并“加锁”
+# Usages  :
+# History : Please check the end of file.
+###############################################################################
+
+password='robotemi2018'
+lastarg="${!#}"
+params=("$@")
+if [ $# -ge 2 -a -d "$lastarg" ]; then
+	basedir=$(basename "$lastarg")
+	ls_attr=`lsattr "${lastarg}/../" | grep "${lastarg}/../${basedir}" | grep -o "\-ia-"`
+
+	[ "-ia-" = "$ls_attr" ] && echo ${password} | sudo -S chattr -ia "$lastarg"
+	cp -rf "${params[@]}" || echo "copy error, maybe exist same file!!" && retval=1
+	[ "-ia-" = "$ls_attr" ] && echo ${password} | sudo -S chattr +ia -R "$lastarg"
+	
+	[ $retval -ne 1 ] && echo "files has copy finished! Please check:"
+	echo -e "\n*** [$lastarg] files list: ***"
+	ls "$lastarg"
+else
+	echo "arguments is error! please try again."
+	echo "Usage: Copy src_files dst_dir"
+fi
+
+###############################################################################
+# Author        Date        Version    Abstract
+#------------------------------------------------------------------------------
+# Kevin Oscar   2021-06-30  v0.1       Initial version create
+#------------------------------------------------------------------------------
+###############################################################################
