@@ -1,0 +1,35 @@
+#!/bin/env bash
+# Eleve
+# This script could generate a QR code for transfering some small files such as apk files from pc to android phone
+# Transfer files through http protocol which require both pc and phone are connected to the same wifi
+# The transfer speed is far faster through http directly than some other 3rd party apps
+
+file_currdir=$(basename "$1")
+if [ -f $file_currdir ]; then
+	my_ip=`hostname -I | grep -o "^[0-9.]*"`
+	file_urladdr="http://$my_ip:9998/$file_currdir"
+else
+	echo "Error: Only support transfer the file of current dir!!!"
+	exit 1
+fi
+qr_imagename="$1".png
+
+if [[ ! $1 ]]; then
+	echo "One filename is required at least"
+	echo "For example: $0 your_current_dir_file"
+	exit 1
+fi
+
+nohup python3 -m http.server 9998 > /dev/null &
+
+type qrencode >/dev/null 2>&1 || sudo apt install qrencode
+qrencode -o $qr_imagename "$file_urladdr"
+
+display $qr_imagename &
+sleep 60
+
+killall display
+rm $qr_imagename
+kill -9 $(lsof -i:9998 | grep "python3" | awk '{print $2}')
+
+exit 0
